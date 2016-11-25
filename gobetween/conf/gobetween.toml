@@ -1,0 +1,15 @@
+[logging]
+level = "debug"
+
+[servers.app]
+bind = "0.0.0.0:80"
+protocol = "tcp"
+balance = "roundrobin"
+
+  [servers.app.discovery]
+    interval = "10s"
+    timeout = "2s"
+    kind = "docker"
+    docker_endpoint = "unix://var/run/docker.sock"  # Docker / Swarm API
+    docker_container_label = "scale.app=true"  # label to filter containers
+    docker_container_private_port = 8080   # gobetween will take public container port for this private port
