@@ -2,6 +2,9 @@
 # Global configuration
 ################################################################
 port = ":80"
+defaultEntryPoints = ["http"]
+logLevel = "DEBUG"
+debug = true
 
 ################################################################
 # Web configuration backend

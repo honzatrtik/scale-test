@@ -5,37 +5,56 @@ networks:
 
 services:
   app:
-    image: php:7.0-alpine
+    build:
+      context: .
+      dockerfile: ./php.Dockerfile
     expose:
-      - 8080
+      - 80
+
     volumes:
       - .:/data
-    command: php -S 0.0.0.0:8080 /data/index.php
+    command: php -S 0.0.0.0:80 /data/index.php
+    networks:
+      - backend
+    depends_on:
+      - redis
+    links:
+       - redis:redis
+    labels:
+      - "scale.app=true"
+      - "traefik.backend=app"
+      - "traefik.frontend.rule=Host:local.docker"
+
+  redis:
+    image: redis:3.0-alpine
     networks:
       - backend
     labels:
-      - "scale.app=true"
-      - "traefik.tags=app"
+      - "traefik.enable=false"
 
-#  traefik:
-#    image: traefik
-#    depends_on:
-#      - app
-#    ports:
-#      - "8080:8080"
-#      - "80:80"
-#    volumes:
-#      - "./traefik/traefik.toml:/etc/traefik/traefik.toml"
-#      - "/var/run/docker.sock:/var/run/docker.sock"
-
-  gobetween:
-    image: yyyar/gobetween
+  traefik:
+    image: traefik
     depends_on:
       - app
     ports:
+      - "8080:8080"
       - "80:80"
-    volumes:
-      - "./gobetween/conf:/etc/gobetween/conf/:rw"
-      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - backend
+    volumes:
+      - "./traefik/traefik.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+
+#  gobetween:
+#    image: yyyar/gobetween
+#    depends_on:
+#      - app
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - "./gobetween/conf:/etc/gobetween/conf/:rw"
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#    networks:
+#      - backend
