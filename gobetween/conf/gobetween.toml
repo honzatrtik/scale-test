@@ -13,3 +13,4 @@ balance = "roundrobin"
     docker_endpoint = "unix://var/run/docker.sock"  # Docker / Swarm API
     docker_container_label = "scale.app=true"  # label to filter containers
     docker_container_private_port = 8080   # gobetween will take public container port for this private port
+    docker_container_host_env_var = "HOSTNAME"
