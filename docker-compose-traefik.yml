@@ -1,0 +1,46 @@
+version: '2'
+
+networks:
+  backend:
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./php.Dockerfile
+    ports:
+      - 80
+    volumes:
+      - .:/data
+    command: php -S 0.0.0.0:80 /data/index.php
+    networks:
+      - backend
+    depends_on:
+      - redis
+    labels:
+      - "scale.app=true"
+      - "traefik.backend=app"
+      - "traefik.frontend.rule=Host:local.docker"
+
+  redis:
+    image: redis:3.0-alpine
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=false"
+
+  traefik:
+    image: traefik:v1.1.2-alpine
+    depends_on:
+      - app
+    ports:
+      - "8080:8080"
+      - "80:80"
+    networks:
+      - backend
+    volumes:
+      - "./traefik/traefik.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+    command: traefik

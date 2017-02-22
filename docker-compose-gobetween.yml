@@ -20,33 +20,12 @@ services:
     links:
        - redis:redis
     environment:
-      - "HOST_IP=10.211.55.12"
-    labels:
-      - "scale.app=true"
-      - "traefik.backend=app"
-      - "traefik.frontend.rule=Host:local.docker"
+      - "HOST_IP=10.211.55.12" # Replace with docker-machine ip
 
   redis:
     image: redis:3.0-alpine
     networks:
       - backend
-    labels:
-      - "traefik.enable=false"
-
-#  traefik:
-#    image: traefik
-#    depends_on:
-#      - app
-#    ports:
-#      - "8080:8080"
-#      - "80:80"
-#    networks:
-#      - backend
-#    volumes:
-#      - "./traefik/traefik.toml:/etc/traefik/traefik.toml"
-#      - "/var/run/docker.sock:/var/run/docker.sock"
-#    labels:
-#      - "traefik.enable=false"
 
   gobetween:
     image: yyyar/gobetween
